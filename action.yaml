@@ -1,0 +1,41 @@
+name: Docker Build & Push to GCR
+description: Builds a dockerr image and pushes to Google Cloud Registry
+branding:
+  icon: 'terminal'
+  color: 'blue'
+runs:
+  using: docker
+  image: Dockerfile
+inputs:
+  gcloud_service_key:
+    description: Google cloud service key as json
+    required: true
+  registry:
+    description: The registry where the image should be pushed
+    required: false
+    default: 'gcr.io'
+  project_id:
+    description: The project id
+    required: true
+  image_name:
+    description: The image name
+    required: true
+  image_tag:
+    description: Tag name
+    required: false
+    default: latest
+  dockerfile:
+    description: Dockerfile that will build the image
+    required: false
+    default: ""
+  context:
+    description: Docker build context
+    required: false
+    default: '.'
+  target:
+    description: Mutli-staged build target
+    required: false
+    default: ""
+  build_args:
+    description: "Pass a list of env vars as build-args for docker-build, separated by commas"
+    required: false
