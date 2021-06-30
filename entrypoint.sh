@@ -14,8 +14,8 @@ ALL_IMAGE_TAG=()
 ALL_IMAGE_TAG+=($(git rev-parse --short HEAD))
 
 echo "Authenticating docker to gcloud ..."
-if ! echo $INPUT_GCLOUD_SERVICE_KEY | python -m base64 -d >/tmp/key.json 2>/dev/null; then
-    echo "Failed to decode gcloud_service_key -- did you forget to encode it using 'python -m base64 -e < yourkey.json'?"
+if ! echo $INPUT_GCLOUD_SERVICE_KEY | base64 -d >/tmp/key.json 2>/dev/null; then
+    echo "Failed to decode gcloud_service_key"
     exit 1
 fi
 
