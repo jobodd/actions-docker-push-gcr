@@ -39,3 +39,7 @@ inputs:
   build_args:
     description: "Pass a list of env vars as build-args for docker-build, separated by commas"
     required: false
+  push:
+    description: "Whether to push the docker image to the remote repo [yes/no]"
+    required: true
+    default: "no"

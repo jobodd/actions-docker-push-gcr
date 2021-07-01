@@ -13,17 +13,19 @@ function split_csv() {
 ALL_IMAGE_TAG=()
 ALL_IMAGE_TAG+=($(git rev-parse --short HEAD))
 
-echo "Authenticating docker to gcloud ..."
-if ! echo $INPUT_GCLOUD_SERVICE_KEY | base64 -d >/tmp/key.json 2>/dev/null; then
-    echo "Failed to decode gcloud_service_key"
-    exit 1
-fi
+if [$INPUT_PUSH == "yes"] ; then
+    echo "Authenticating docker to gcloud ..."
+    if ! echo $INPUT_GCLOUD_SERVICE_KEY | base64 -d >/tmp/key.json 2>/dev/null; then
+        echo "Failed to decode gcloud_service_key"
+        exit 1
+    fi
 
-if cat /tmp/key.json | docker login -u _json_key --password-stdin https://$INPUT_REGISTRY; then
-    echo "Logged in to google cloud ..."
-else
-    echo "Docker login failed. Exiting ..."
-    exit 1
+    if cat /tmp/key.json | docker login -u _json_key --password-stdin https://$INPUT_REGISTRY; then
+        echo "Logged in to google cloud ..."
+    else
+        echo "Docker login failed. Exiting ..."
+        exit 1
+    fi
 fi
 
 split_csv $INPUT_IMAGE_TAG ALL_IMAGE_TAG
@@ -63,14 +65,15 @@ for IMAGE_TAG in ${ALL_IMAGE_TAG[@]}; do
     echo "Creating docker tag ..."
 
     docker tag $TEMP_IMAGE_NAME $IMAGE_NAME
+    if [$INPUT_PUSH == "yes"] ; then
+        echo "Pushing image $IMAGE_NAME ..."
 
-    echo "Pushing image $IMAGE_NAME ..."
-
-    if ! docker push $IMAGE_NAME; then
-        echo "Pushing failed. Exiting ..."
-        exit 1
-    else
-        echo "Image pushed."
+        if ! docker push $IMAGE_NAME; then
+            echo "Pushing failed. Exiting ..."
+            exit 1
+        else
+            echo "Image pushed."
+        fi
     fi
 done
 
